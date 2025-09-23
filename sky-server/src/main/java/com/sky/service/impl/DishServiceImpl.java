@@ -88,12 +88,17 @@ public class DishServiceImpl implements DishService {
             throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
         }
         // 可以删除了
-        for (Long id : ids) {
+        /*for (Long id : ids) {
             dishMapper.deleteBy(id);
             // 删除关联的口味
             dishFlavorMapper.deleteBydishId(id);
-        }
-
+        }*/
+        // 批量删除
+        // delete from dish where id in (...)
+        dishMapper.deleteByIds(ids);
+        // 批量删除关联的口味
+        // delete from dish_flavor where dish_id in (...)
+        dishFlavorMapper.deleteBydishIds(ids);
     }
     /**
      * 根据id查询菜品和对应的口味
@@ -132,6 +137,12 @@ public class DishServiceImpl implements DishService {
             // 向口味表中插入n条数据
             dishFlavorMapper.bentch(flavors);
         }
+    }
+
+    @Override
+    public void startOrStop(Integer status, Long id) {
+        Dish dish = Dish.builder().status(status).id(id).build();
+        dishMapper.update(dish);
     }
 
 
